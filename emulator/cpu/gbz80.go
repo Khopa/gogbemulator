@@ -11,6 +11,8 @@ type Gbz80 struct {
 	pc uint16 // Program Counter
 }
 
+const A = 0x01 // Accumulator
+
 /**
  * Create a new instance of the Z80 Registers
  */
