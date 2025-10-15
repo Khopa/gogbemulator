@@ -1,6 +1,21 @@
-package cpu
+package emulator
 
 import "fmt"
+
+type DMG struct {
+	gbz80  *Gbz80
+	memory [MemorySize]uint8 // 64KB Memory
+}
+
+// SetMemoryU8 sets memory at address to value
+func (dmg *DMG) SetMemoryU8(address uint16, value uint8) {
+	dmg.memory[address] = value
+}
+
+// GetMemoryU8 gets memory value at address
+func (dmg *DMG) GetMemoryU8(address uint16) uint8 {
+	return dmg.memory[address]
+}
 
 type Gbz80 struct {
 	af uint16 // Accumulator & Flags
@@ -131,6 +146,10 @@ func (gbz80 *Gbz80) H() uint8 {
 
 func (gbz80 *Gbz80) L() uint8 {
 	return uint8(gbz80.hl & 0x00FF)
+}
+
+func (gbz80 *Gbz80) HL() uint16 {
+	return gbz80.hl
 }
 
 // Stack Pointer (SP) and Program Counter (PC) access

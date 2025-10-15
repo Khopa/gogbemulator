@@ -1,31 +1,24 @@
 package emulator
 
-import (
-	"fmt"
+import "fmt"
 
-	"khopa.github.io/gogbemulator/emulator/cpu"
-)
-
-type DMG struct {
-	gbz80 *cpu.Gbz80
-}
-
+/**
+ * Create a new instance of the DMG (Game Boy)
+ */
 func MakeDMG() *DMG {
-
-	// Create CPU
-	var gbz80 *cpu.Gbz80
-	gbz80 = cpu.MakeGbz80()
-
-	// Create DMG Game boy model
+	var mem [MemorySize]uint8
 	return &DMG{
-		gbz80,
+		gbz80:  MakeGbz80(),
+		memory: mem,
 	}
-
 }
 
+/**
+ * Print the DMG state
+ */
 func (dmg *DMG) Print() {
 	fmt.Println("DMG Model :")
-	fmt.Println("-----------\n")
-	fmt.Println("GB Z80 CPU Registers :\n")
+	fmt.Println("-----------")
+	fmt.Println("GB Z80 CPU Registers :")
 	dmg.gbz80.Print()
 }
