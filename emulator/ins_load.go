@@ -38,6 +38,11 @@ func LDr16A(dmg *DMG, r16 uint16) {
 	dmg.SetMemoryU8(r16, dmg.gbz80.A())
 }
 
+// LDAr16 Copy the byte pointed to by r16 into register A.
+func LDAr16(dmg *DMG, r16 uint16) {
+	dmg.gbz80.SetR8Register(R8_A, dmg.memory[r16])
+}
+
 // LDHn16A Copy the value in register A into the byte at address n16.
 func LDHn16A(dmg *DMG, n16 uint16) {
 	dmg.SetMemoryU8(n16, dmg.gbz80.A())

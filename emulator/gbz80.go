@@ -46,7 +46,48 @@ const (
 	R16_DE R16Register = 1 // D&E registers
 	R16_HL R16Register = 2 // H&L registers
 	R16_SP R16Register = 3 // Stack Pointer
+	R16_AF R16Register = 4 // A&F Registers
 )
+
+// Conditions Table (For CPU Matrix)
+const (
+	CC_NZ = 0
+	CC_Z  = 1
+	CC_NC = 2
+	CC_C  = 3
+)
+
+// ALU Table (For CPU Matrix)
+const (
+	ALU_ADD_A = 0
+	ALU_ADC_A = 1
+	ALU_SUB   = 2
+	ALU_SBC_A = 3
+	ALU_AND   = 4
+	ALU_XOR   = 5
+	ALU_OR    = 6
+	ALU_CP    = 7
+)
+
+// ROT Table (For CPU Matrix)
+const (
+	ROT_RLC  = 0
+	ROT_RRC  = 0
+	ROT_RL   = 0
+	ROT_RR   = 0
+	ROT_SLA  = 0
+	ROT_SRA  = 0
+	ROT_SWAP = 0
+	ROT_SRL  = 0
+)
+
+// CPU Matrix Tables
+var R = []R8Register{R8_B, R8_C, R8_D, R8_E, R8_H, R8_L, R8_HL, R8_A}
+var RP = []R16Register{R16_BC, R16_DE, R16_HL, R16_SP}
+var RP2 = []R16Register{R16_BC, R16_DE, R16_HL, R16_AF}
+var CC = []uint8{CC_NZ, CC_Z, CC_NC, CC_C}
+var ALU = []uint8{ALU_ADD_A, ALU_ADC_A, ALU_SUB, ALU_SBC_A, ALU_AND, ALU_XOR, ALU_OR, ALU_CP}
+var ROT = []uint8{ROT_RLC, ROT_RRC, ROT_RL, ROT_RR, ROT_SLA, ROT_SRA, ROT_SWAP, ROT_SRL}
 
 // MakeGbz80 Create a new instance of the Z80 Registers
 func MakeGbz80() *Gbz80 {
@@ -175,11 +216,30 @@ func (gbz80 *Gbz80) SetR8Register(reg R8Register, value uint8) {
 	}
 }
 
+func (gbz80 *Gbz80) ResetBitInR8Register(reg R8Register, bit uint8) {
+	switch reg {
+	case R8_A:
+		gbz80.af = (gbz80.af & 0x00FF) | ((gbz80.af & 0xFF00) ^ (0x0100 << bit))
+	case R8_B:
+		gbz80.bc = (gbz80.bc & 0x00FF) | ((gbz80.bc & 0xFF00) ^ (0x0100 << bit))
+	case R8_C:
+		gbz80.bc = (gbz80.bc & 0xFF00) | ((gbz80.bc & 0x00FF) ^ (0x01 << bit))
+	case R8_D:
+		gbz80.de = (gbz80.de & 0x00FF) | ((gbz80.de & 0xFF00) ^ (0x0100 << bit))
+	case R8_E:
+		gbz80.de = (gbz80.de & 0xFF00) | ((gbz80.de & 0x00FF) ^ (0x01 << bit))
+	case R8_H:
+		gbz80.hl = (gbz80.hl & 0x00FF) | ((gbz80.hl & 0xFF00) ^ (0x0100 << bit))
+	case R8_L:
+		gbz80.hl = (gbz80.hl & 0xFF00) | ((gbz80.hl & 0x00FF) ^ (0x01 << bit))
+	}
+}
+
 // GetR8Register Getter for 8-bit registers
 func (gbz80 *Gbz80) GetR8Register(reg R8Register) uint8 {
 	switch reg {
 	case R8_A:
-		return uint8(gbz80.af >> 8)
+		return uint8(gbz80.bc >> 8)
 	case R8_B:
 		return uint8(gbz80.bc >> 8)
 	case R8_C:
@@ -200,13 +260,13 @@ func (gbz80 *Gbz80) GetR8Register(reg R8Register) uint8 {
 func (gbz80 *Gbz80) SetR16Register(reg R16Register, value uint16) {
 	switch reg {
 	case R16_BC:
-		gbz80.af = value
-	case R16_DE:
 		gbz80.bc = value
-	case R16_HL:
+	case R16_DE:
 		gbz80.de = value
-	case R16_SP:
+	case R16_HL:
 		gbz80.hl = value
+	case R16_SP:
+		gbz80.sp = value
 	}
 }
 
@@ -214,13 +274,13 @@ func (gbz80 *Gbz80) SetR16Register(reg R16Register, value uint16) {
 func (gbz80 *Gbz80) GetR16Register(reg R16Register) uint16 {
 	switch reg {
 	case R16_BC:
-		return gbz80.af
-	case R16_DE:
 		return gbz80.bc
-	case R16_HL:
+	case R16_DE:
 		return gbz80.de
-	case R16_SP:
+	case R16_HL:
 		return gbz80.hl
+	case R16_SP:
+		return gbz80.sp
 	}
 	return 0
 }
