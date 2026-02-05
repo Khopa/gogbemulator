@@ -149,14 +149,24 @@ func (dmg *DMG) ExecuteCurrentInstruction() {
 				}
 			case 0x3:
 				// 16 Bit Inc Dec
+				if q == 0 {
+					IncR16(dmg, RP[p])
+				} else {
+					DecR16(dmg, RP[p])
+				}
 			case 0x4:
-				// 8 Bit Inc
+				IncR8(dmg, R[y])
 			case 0x5:
-				// 8 Bit Dec
+				DecR8(dmg, R[y])
 			case 0x6:
-				// 8 Bit Load immediate
+				n := dmg.memory[dmg.gbz80.pc]
+				LDr8n8(dmg, R[y], n)
+				dmg.gbz80.pc++
 			case 0x7:
 				// Assorted ops on accumulator flags
+				switch y {
+
+				}
 			}
 		case 1:
 			if z == 6 && y == 6 {

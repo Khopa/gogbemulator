@@ -284,3 +284,23 @@ func (gbz80 *Gbz80) GetR16Register(reg R16Register) uint16 {
 	}
 	return 0
 }
+
+// IncrementR8Register Increment Value in R8 register
+func (gbz80 *Gbz80) IncrementR8Register(reg R8Register) {
+	gbz80.SetR8Register(reg, gbz80.GetR8Register(reg)+1)
+}
+
+// DecrementR8Register Decrement Value in R8 register
+func (gbz80 *Gbz80) DecrementR8Register(reg R8Register) {
+	gbz80.SetR8Register(reg, gbz80.GetR8Register(reg)-1)
+}
+
+// IncrementR16Register Increment Value in R16 register
+func (gbz80 *Gbz80) IncrementR16Register(reg R16Register) {
+	gbz80.SetR16Register(reg, gbz80.GetR16Register(reg)+1)
+}
+
+// DecrementR16Register Decrement Value in R16 register
+func (gbz80 *Gbz80) DecrementR16Register(reg R16Register) {
+	gbz80.SetR16Register(reg, gbz80.GetR16Register(reg)-1)
+}
