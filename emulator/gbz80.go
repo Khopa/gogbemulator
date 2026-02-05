@@ -48,9 +48,7 @@ const (
 	R16_SP R16Register = 3 // Stack Pointer
 )
 
-/**
- * Create a new instance of the Z80 Registers
- */
+// MakeGbz80 Create a new instance of the Z80 Registers
 func MakeGbz80() *Gbz80 {
 	return &Gbz80{
 		af: 0b0000000010000000,
@@ -62,9 +60,7 @@ func MakeGbz80() *Gbz80 {
 	}
 }
 
-/**
- * Print the CPU registers in binary format.
- */
+// Print the CPU registers in binary format.
 func (gbz80 *Gbz80) Print() {
 	fmt.Printf("A|F %016b\n", gbz80.af)
 	fmt.Printf("B|C %016b\n", gbz80.bc)
@@ -74,9 +70,7 @@ func (gbz80 *Gbz80) Print() {
 	fmt.Printf("PC: %016b\n", gbz80.pc)
 }
 
-/**
- * Reset the CPU registers to their initial state.
- */
+// Reset the CPU registers to their initial state.
 func (gbz80 *Gbz80) Reset() {
 	gbz80.af = 0b0000000000000000
 	gbz80.bc = 0b0000000000000000
@@ -86,8 +80,7 @@ func (gbz80 *Gbz80) Reset() {
 	gbz80.pc = 0b0000000000000000
 }
 
-// Accumulator (A) and Flag Registers access (F)
-
+// A Get Accumulator (A) and Flag Registers access (F)
 func (gbz80 *Gbz80) A() uint8 {
 	return uint8(gbz80.af >> 8)
 }
@@ -162,7 +155,7 @@ func (gbz80 *Gbz80) PC() uint16 {
 	return gbz80.pc
 }
 
-// Setter for 8-bit registers
+// SetR8Register Setter for 8-bit registers
 func (gbz80 *Gbz80) SetR8Register(reg R8Register, value uint8) {
 	switch reg {
 	case R8_A:
@@ -182,7 +175,7 @@ func (gbz80 *Gbz80) SetR8Register(reg R8Register, value uint8) {
 	}
 }
 
-// Getter for 8-bit registers
+// GetR8Register Getter for 8-bit registers
 func (gbz80 *Gbz80) GetR8Register(reg R8Register) uint8 {
 	switch reg {
 	case R8_A:
@@ -203,7 +196,7 @@ func (gbz80 *Gbz80) GetR8Register(reg R8Register) uint8 {
 	return 0
 }
 
-// Setter for 16-bit registers
+// SetR16Register Setter for 16-bit registers
 func (gbz80 *Gbz80) SetR16Register(reg R16Register, value uint16) {
 	switch reg {
 	case R16_BC:
@@ -217,7 +210,7 @@ func (gbz80 *Gbz80) SetR16Register(reg R16Register, value uint16) {
 	}
 }
 
-// Getter for 16-bit registers
+// GetR16Register Getter for 16-bit registers
 func (gbz80 *Gbz80) GetR16Register(reg R16Register) uint16 {
 	switch reg {
 	case R16_BC:
