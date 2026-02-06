@@ -165,22 +165,24 @@ func (dmg *DMG) ExecuteCurrentInstruction() {
 			case 0x7:
 				// Assorted ops on accumulator flags
 				switch y {
-
+				case 0:
+					Rlca(dmg)
+				case 1:
+					Rrca(dmg)
 				}
 			}
 		case 1:
+			// 8 Bit Loading
 			if z == 6 && y == 6 {
 				// HALT
 			} else {
 				LDr8r8(dmg, R[y], R[z])
 			}
 		case 2:
-			// ALU operations
+			// ALU operations on acc & registers
 
 		case 3:
-			// 16 Bit Inc Dec
-		case 4:
-			// 16 Bit Inc Dec
+			// Jump, Pop, Call, Returns
 		}
 
 	} else {
