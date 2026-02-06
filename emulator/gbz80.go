@@ -3,27 +3,27 @@ package emulator
 import "fmt"
 
 type DMG struct {
-	gbz80  *Gbz80
-	memory [MemorySize]uint8 // 64KB Memory
+	Gbz80  *Gbz80
+	Memory [MemorySize]uint8 // 64KB Memory
 }
 
-// SetMemoryU8 sets memory at address to value
+// SetMemoryU8 sets Memory at address to value
 func (dmg *DMG) SetMemoryU8(address uint16, value uint8) {
-	dmg.memory[address] = value
+	dmg.Memory[address] = value
 }
 
-// GetMemoryU8 gets memory value at address
+// GetMemoryU8 gets Memory value at address
 func (dmg *DMG) GetMemoryU8(address uint16) uint8 {
-	return dmg.memory[address]
+	return dmg.Memory[address]
 }
 
 type Gbz80 struct {
-	af uint16 // Accumulator & Flags
-	bc uint16 // B&C registers
-	de uint16 // D&E registers
-	hl uint16 // H&L registers
-	sp uint16 // Stack pointer
-	pc uint16 // Program Counter
+	Af uint16 // Accumulator & Flags
+	Bc uint16 // B&C registers
+	De uint16 // D&E registers
+	Hl uint16 // H&L registers
+	Sp uint16 // Stack pointer
+	Pc uint16 // Program Counter
 }
 
 type R8Register uint8
@@ -92,38 +92,38 @@ var ROT = []uint8{ROT_RLC, ROT_RRC, ROT_RL, ROT_RR, ROT_SLA, ROT_SRA, ROT_SWAP, 
 // MakeGbz80 Create a new instance of the Z80 Registers
 func MakeGbz80() *Gbz80 {
 	return &Gbz80{
-		af: 0b0000000010000000,
-		bc: 0b0000000000000000,
-		de: 0b0000000000000000,
-		hl: 0b0000000000000000,
-		sp: 0b0000000000000000,
-		pc: 0b0000000000000000,
+		Af: 0b0000000010000000,
+		Bc: 0b0000000000000000,
+		De: 0b0000000000000000,
+		Hl: 0b0000000000000000,
+		Sp: 0b0000000000000000,
+		Pc: 0b0000000000000000,
 	}
 }
 
 // Print the CPU registers in binary format.
 func (gbz80 *Gbz80) Print() {
-	fmt.Printf("A|F %016b\n", gbz80.af)
-	fmt.Printf("B|C %016b\n", gbz80.bc)
-	fmt.Printf("D|E %016b\n", gbz80.de)
-	fmt.Printf("H|L %016b\n", gbz80.hl)
-	fmt.Printf("SP: %016b\n", gbz80.sp)
-	fmt.Printf("PC: %016b\n", gbz80.pc)
+	fmt.Printf("A|F %016b\n", gbz80.Af)
+	fmt.Printf("B|C %016b\n", gbz80.Bc)
+	fmt.Printf("D|E %016b\n", gbz80.De)
+	fmt.Printf("H|L %016b\n", gbz80.Hl)
+	fmt.Printf("SP: %016b\n", gbz80.Sp)
+	fmt.Printf("PC: %016b\n", gbz80.Pc)
 }
 
 // Reset the CPU registers to their initial state.
 func (gbz80 *Gbz80) Reset() {
-	gbz80.af = 0b0000000000000000
-	gbz80.bc = 0b0000000000000000
-	gbz80.de = 0b0000000000000000
-	gbz80.hl = 0b0000000000000000
-	gbz80.sp = 0b0000000000000000
-	gbz80.pc = 0b0000000000000000
+	gbz80.Af = 0b0000000000000000
+	gbz80.Bc = 0b0000000000000000
+	gbz80.De = 0b0000000000000000
+	gbz80.Hl = 0b0000000000000000
+	gbz80.Sp = 0b0000000000000000
+	gbz80.Pc = 0b0000000000000000
 }
 
 // A Get Accumulator (A) and Flag Registers access (F)
 func (gbz80 *Gbz80) A() uint8 {
-	return uint8(gbz80.af >> 8)
+	return uint8(gbz80.Af >> 8)
 }
 
 // Flag Register (F) bits:
@@ -137,101 +137,101 @@ func (gbz80 *Gbz80) A() uint8 {
 // +-----+-----+--------------------------+
 
 func (gbz80 *Gbz80) ZeroFlag() bool {
-	return (gbz80.af & 0b0001) != 0
+	return (gbz80.Af & 0b0001) != 0
 }
 
 func (gbz80 *Gbz80) SubtractionFlag() bool {
-	return (gbz80.af & 0b0010) != 0
+	return (gbz80.Af & 0b0010) != 0
 }
 
 func (gbz80 *Gbz80) HalfCarryFlag() bool {
-	return (gbz80.af & 0b0100) != 0
+	return (gbz80.Af & 0b0100) != 0
 }
 
 func (gbz80 *Gbz80) CarryFlag() bool {
-	return (gbz80.af & 0b1000) != 0
+	return (gbz80.Af & 0b1000) != 0
 }
 
 // BC Registers access
 
 func (gbz80 *Gbz80) B() uint8 {
-	return uint8(gbz80.bc >> 8)
+	return uint8(gbz80.Bc >> 8)
 }
 
 func (gbz80 *Gbz80) C() uint8 {
-	return uint8(gbz80.bc & 0x00FF)
+	return uint8(gbz80.Bc & 0x00FF)
 }
 
 // DE Registers access
 
 func (gbz80 *Gbz80) D() uint8 {
-	return uint8(gbz80.de >> 8)
+	return uint8(gbz80.De >> 8)
 }
 
 func (gbz80 *Gbz80) E() uint8 {
-	return uint8(gbz80.de & 0x00FF)
+	return uint8(gbz80.De & 0x00FF)
 }
 
 // HL Registers access
 
 func (gbz80 *Gbz80) H() uint8 {
-	return uint8(gbz80.hl >> 8)
+	return uint8(gbz80.Hl >> 8)
 }
 
 func (gbz80 *Gbz80) L() uint8 {
-	return uint8(gbz80.hl & 0x00FF)
+	return uint8(gbz80.Hl & 0x00FF)
 }
 
 func (gbz80 *Gbz80) HL() uint16 {
-	return gbz80.hl
+	return gbz80.Hl
 }
 
 // Stack Pointer (SP) and Program Counter (PC) access
 
 func (gbz80 *Gbz80) SP() uint16 {
-	return gbz80.sp
+	return gbz80.Sp
 }
 
 func (gbz80 *Gbz80) PC() uint16 {
-	return gbz80.pc
+	return gbz80.Pc
 }
 
 // SetR8Register Setter for 8-bit registers
 func (gbz80 *Gbz80) SetR8Register(reg R8Register, value uint8) {
 	switch reg {
 	case R8_A:
-		gbz80.af = (gbz80.af & 0x00FF) | (uint16(value) << 8)
+		gbz80.Af = (gbz80.Af & 0x00FF) | (uint16(value) << 8)
 	case R8_B:
-		gbz80.bc = (gbz80.bc & 0x00FF) | (uint16(value) << 8)
+		gbz80.Bc = (gbz80.Bc & 0x00FF) | (uint16(value) << 8)
 	case R8_C:
-		gbz80.bc = (gbz80.bc & 0xFF00) | uint16(value)
+		gbz80.Bc = (gbz80.Bc & 0xFF00) | uint16(value)
 	case R8_D:
-		gbz80.de = (gbz80.de & 0x00FF) | (uint16(value) << 8)
+		gbz80.De = (gbz80.De & 0x00FF) | (uint16(value) << 8)
 	case R8_E:
-		gbz80.de = (gbz80.de & 0xFF00) | uint16(value)
+		gbz80.De = (gbz80.De & 0xFF00) | uint16(value)
 	case R8_H:
-		gbz80.hl = (gbz80.hl & 0x00FF) | (uint16(value) << 8)
+		gbz80.Hl = (gbz80.Hl & 0x00FF) | (uint16(value) << 8)
 	case R8_L:
-		gbz80.hl = (gbz80.hl & 0xFF00) | uint16(value)
+		gbz80.Hl = (gbz80.Hl & 0xFF00) | uint16(value)
 	}
 }
 
 func (gbz80 *Gbz80) ResetBitInR8Register(reg R8Register, bit uint8) {
 	switch reg {
 	case R8_A:
-		gbz80.af = (gbz80.af & 0x00FF) | ((gbz80.af & 0xFF00) ^ (0x0100 << bit))
+		gbz80.Af = (gbz80.Af & 0x00FF) | ((gbz80.Af & 0xFF00) ^ (0x0100 << bit))
 	case R8_B:
-		gbz80.bc = (gbz80.bc & 0x00FF) | ((gbz80.bc & 0xFF00) ^ (0x0100 << bit))
+		gbz80.Bc = (gbz80.Bc & 0x00FF) | ((gbz80.Bc & 0xFF00) ^ (0x0100 << bit))
 	case R8_C:
-		gbz80.bc = (gbz80.bc & 0xFF00) | ((gbz80.bc & 0x00FF) ^ (0x01 << bit))
+		gbz80.Bc = (gbz80.Bc & 0xFF00) | ((gbz80.Bc & 0x00FF) ^ (0x01 << bit))
 	case R8_D:
-		gbz80.de = (gbz80.de & 0x00FF) | ((gbz80.de & 0xFF00) ^ (0x0100 << bit))
+		gbz80.De = (gbz80.De & 0x00FF) | ((gbz80.De & 0xFF00) ^ (0x0100 << bit))
 	case R8_E:
-		gbz80.de = (gbz80.de & 0xFF00) | ((gbz80.de & 0x00FF) ^ (0x01 << bit))
+		gbz80.De = (gbz80.De & 0xFF00) | ((gbz80.De & 0x00FF) ^ (0x01 << bit))
 	case R8_H:
-		gbz80.hl = (gbz80.hl & 0x00FF) | ((gbz80.hl & 0xFF00) ^ (0x0100 << bit))
+		gbz80.Hl = (gbz80.Hl & 0x00FF) | ((gbz80.Hl & 0xFF00) ^ (0x0100 << bit))
 	case R8_L:
-		gbz80.hl = (gbz80.hl & 0xFF00) | ((gbz80.hl & 0x00FF) ^ (0x01 << bit))
+		gbz80.Hl = (gbz80.Hl & 0xFF00) | ((gbz80.Hl & 0x00FF) ^ (0x01 << bit))
 	}
 }
 
@@ -239,19 +239,19 @@ func (gbz80 *Gbz80) ResetBitInR8Register(reg R8Register, bit uint8) {
 func (gbz80 *Gbz80) GetR8Register(reg R8Register) uint8 {
 	switch reg {
 	case R8_A:
-		return uint8(gbz80.bc >> 8)
+		return uint8(gbz80.Bc >> 8)
 	case R8_B:
-		return uint8(gbz80.bc >> 8)
+		return uint8(gbz80.Bc >> 8)
 	case R8_C:
-		return uint8(gbz80.bc & 0x00FF)
+		return uint8(gbz80.Bc & 0x00FF)
 	case R8_D:
-		return uint8(gbz80.de >> 8)
+		return uint8(gbz80.De >> 8)
 	case R8_E:
-		return uint8(gbz80.de & 0x00FF)
+		return uint8(gbz80.De & 0x00FF)
 	case R8_H:
-		return uint8(gbz80.hl >> 8)
+		return uint8(gbz80.Hl >> 8)
 	case R8_L:
-		return uint8(gbz80.hl & 0x00FF)
+		return uint8(gbz80.Hl & 0x00FF)
 	}
 	return 0
 }
@@ -260,15 +260,15 @@ func (gbz80 *Gbz80) GetR8Register(reg R8Register) uint8 {
 func (gbz80 *Gbz80) SetR16Register(reg R16Register, value uint16) {
 	switch reg {
 	case R16_BC:
-		gbz80.bc = value
+		gbz80.Bc = value
 	case R16_DE:
-		gbz80.de = value
+		gbz80.De = value
 	case R16_HL:
-		gbz80.hl = value
+		gbz80.Hl = value
 	case R16_SP:
-		gbz80.sp = value
+		gbz80.Sp = value
 	case R16_AF:
-		gbz80.af = value
+		gbz80.Af = value
 	}
 }
 
@@ -276,13 +276,13 @@ func (gbz80 *Gbz80) SetR16Register(reg R16Register, value uint16) {
 func (gbz80 *Gbz80) GetR16Register(reg R16Register) uint16 {
 	switch reg {
 	case R16_BC:
-		return gbz80.bc
+		return gbz80.Bc
 	case R16_DE:
-		return gbz80.de
+		return gbz80.De
 	case R16_HL:
-		return gbz80.hl
+		return gbz80.Hl
 	case R16_SP:
-		return gbz80.sp
+		return gbz80.Sp
 	}
 	return 0
 }

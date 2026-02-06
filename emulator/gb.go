@@ -2,14 +2,15 @@ package emulator
 
 import (
 	"fmt"
+	"os"
 )
 
 // MakeDMG Create a new instance of the DMG (Game Boy)
 func MakeDMG() *DMG {
 	var mem [MemorySize]uint8
 	return &DMG{
-		gbz80:  MakeGbz80(),
-		memory: mem,
+		Gbz80:  MakeGbz80(),
+		Memory: mem,
 	}
 }
 
@@ -18,20 +19,20 @@ func (dmg *DMG) PrintMemory() {
 	for i := 0; i < MemorySize/64; i++ {
 		fmt.Printf("#%04x : ", i*64)
 		for j := 0; j < 64; j++ {
-			fmt.Printf("%x", dmg.memory[i*64+j])
+			fmt.Printf("%x", dmg.Memory[i*64+j])
 		}
 		fmt.Print("\n")
 	}
 }
 
-// PrintMemorySection prints a part of the memory
+// PrintMemorySection prints a part of the Memory
 func (dmg *DMG) PrintMemorySection(start int, end int) {
 	if start < end {
 		for i := start; i < end; i++ {
 			if i%64 == 0 {
 				fmt.Printf("\n#%04x : ", i)
 			}
-			fmt.Printf("%x", dmg.memory[i])
+			fmt.Printf("%x", dmg.Memory[i])
 		}
 	}
 }
@@ -41,7 +42,7 @@ func (dmg *DMG) Print() {
 	fmt.Println("DMG Model :")
 	fmt.Println("-----------")
 	fmt.Println("GB Z80 CPU Registers :")
-	dmg.gbz80.Print()
+	dmg.Gbz80.Print()
 
 	// --------------------------------------
 	dmg.PrintMemorySection(VRAMStart, VRAMEnd)
@@ -52,19 +53,23 @@ func (dmg *DMG) Print() {
 
 }
 
-func (dmg *DMG) Run() {
-
-	dmg.gbz80.pc = ProgramStart
-
-	i := 0
-	for {
-		i++
-
-		if i == 1000 {
-			break
-		}
+func (dmg *DMG) LoadROM(path string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
 	}
 
+	if len(data) > MemorySize {
+		return fmt.Errorf("ROM too large: %d bytes", len(data))
+	}
+
+	copy(dmg.Memory[:], data)
+
+	return nil
+}
+
+func (dmg *DMG) Step() {
+	dmg.ExecuteCurrentInstruction()
 }
 
 func (dmg *DMG) ExecuteCurrentInstruction() {
@@ -74,13 +79,13 @@ func (dmg *DMG) ExecuteCurrentInstruction() {
 
 	// First check for prefix & read opcode
 	isCBPrefixed := false
-	opcode := dmg.memory[dmg.gbz80.pc]
+	opcode := dmg.Memory[dmg.Gbz80.Pc]
 	if opcode == 0xCB {
 		isCBPrefixed = true
-		opcode = dmg.memory[dmg.gbz80.pc+1]
-		dmg.gbz80.pc += 1
+		opcode = dmg.Memory[dmg.Gbz80.Pc+1]
+		dmg.Gbz80.Pc += 1
 	}
-	dmg.gbz80.pc += 1
+	dmg.Gbz80.Pc += 1
 
 	// Compute cpu matrix path values
 	x := opcode & 0xC0
@@ -112,9 +117,9 @@ func (dmg *DMG) ExecuteCurrentInstruction() {
 				// 16 bit load ops
 				if q == 0 {
 					var nn uint16
-					nn = uint16(dmg.memory[dmg.gbz80.pc])<<8 + uint16(dmg.memory[dmg.gbz80.pc+1])
+					nn = uint16(dmg.Memory[dmg.Gbz80.Pc])<<8 + uint16(dmg.Memory[dmg.Gbz80.Pc+1])
 					LDr16n16(dmg, RP[p], nn)
-					dmg.gbz80.pc += 2
+					dmg.Gbz80.Pc += 2
 				} else {
 					// TODO: Add HL, rp[p]
 				}
@@ -123,28 +128,28 @@ func (dmg *DMG) ExecuteCurrentInstruction() {
 				if q == 0 {
 					switch p {
 					case 0:
-						LDr16A(dmg, dmg.gbz80.bc)
+						LDr16A(dmg, dmg.Gbz80.Bc)
 					case 1:
-						LDr16A(dmg, dmg.gbz80.de)
+						LDr16A(dmg, dmg.Gbz80.De)
 					case 2:
-						LDr16A(dmg, dmg.gbz80.hl)
-						dmg.gbz80.hl++
+						LDr16A(dmg, dmg.Gbz80.Hl)
+						dmg.Gbz80.Hl++
 					case 3:
-						LDr16A(dmg, dmg.gbz80.hl)
-						dmg.gbz80.hl--
+						LDr16A(dmg, dmg.Gbz80.Hl)
+						dmg.Gbz80.Hl--
 					}
 				} else {
 					switch p {
 					case 0:
-						LDAr16(dmg, dmg.gbz80.bc)
+						LDAr16(dmg, dmg.Gbz80.Bc)
 					case 1:
-						LDAr16(dmg, dmg.gbz80.de)
+						LDAr16(dmg, dmg.Gbz80.De)
 					case 2:
-						LDAr16(dmg, dmg.gbz80.hl)
-						dmg.gbz80.hl++
+						LDAr16(dmg, dmg.Gbz80.Hl)
+						dmg.Gbz80.Hl++
 					case 3:
-						LDAr16(dmg, dmg.gbz80.hl)
-						dmg.gbz80.hl--
+						LDAr16(dmg, dmg.Gbz80.Hl)
+						dmg.Gbz80.Hl--
 					}
 				}
 			case 0x3:
@@ -159,9 +164,9 @@ func (dmg *DMG) ExecuteCurrentInstruction() {
 			case 0x5:
 				DecR8(dmg, R[y])
 			case 0x6:
-				n := dmg.memory[dmg.gbz80.pc]
+				n := dmg.Memory[dmg.Gbz80.Pc]
 				LDr8n8(dmg, R[y], n)
-				dmg.gbz80.pc++
+				dmg.Gbz80.Pc++
 			case 0x7:
 				// Assorted ops on accumulator flags
 				switch y {
@@ -195,7 +200,7 @@ func (dmg *DMG) ExecuteCurrentInstruction() {
 
 		case 0x2:
 			// Reset bit
-			dmg.gbz80.ResetBitInR8Register(R[z], y)
+			dmg.Gbz80.ResetBitInR8Register(R[z], y)
 		case 0x3:
 			// Set Bit instructions
 
