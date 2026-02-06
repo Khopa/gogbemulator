@@ -267,6 +267,8 @@ func (gbz80 *Gbz80) SetR16Register(reg R16Register, value uint16) {
 		gbz80.hl = value
 	case R16_SP:
 		gbz80.sp = value
+	case R16_AF:
+		gbz80.af = value
 	}
 }
 
