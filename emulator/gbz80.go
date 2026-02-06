@@ -18,12 +18,14 @@ func (dmg *DMG) GetMemoryU8(address uint16) uint8 {
 }
 
 type Gbz80 struct {
-	Af uint16 // Accumulator & Flags
-	Bc uint16 // B&C registers
-	De uint16 // D&E registers
-	Hl uint16 // H&L registers
-	Sp uint16 // Stack pointer
-	Pc uint16 // Program Counter
+	Af     uint16 // Accumulator & Flags
+	Bc     uint16 // B&C registers
+	De     uint16 // D&E registers
+	Hl     uint16 // H&L registers
+	Sp     uint16 // Stack pointer
+	Pc     uint16 // Program Counter
+	Ime    bool   // Internal CPU latch for interrupt
+	Halted bool   // Halt mode
 }
 
 type R8Register uint8
@@ -93,12 +95,14 @@ var ROT = []uint8{ROT_RLC, ROT_RRC, ROT_RL, ROT_RR, ROT_SLA, ROT_SRA, ROT_SWAP, 
 // MakeGbz80 Create a new instance of the Z80 Registers
 func MakeGbz80() *Gbz80 {
 	return &Gbz80{
-		Af: 0b0000000010000000,
-		Bc: 0b0000000000000000,
-		De: 0b0000000000000000,
-		Hl: 0b0000000000000000,
-		Sp: 0b0000000000000000,
-		Pc: 0b0000000000000000,
+		Af:     0b0000000010000000,
+		Bc:     0b0000000000000000,
+		De:     0b0000000000000000,
+		Hl:     0b0000000000000000,
+		Sp:     0b0000000000000000,
+		Pc:     0b0000000000000000,
+		Ime:    false,
+		Halted: false,
 	}
 }
 
@@ -335,4 +339,8 @@ func (gbz80 *Gbz80) IncrementR16Register(reg R16Register) {
 // DecrementR16Register Decrement Value in R16 register
 func (gbz80 *Gbz80) DecrementR16Register(reg R16Register) {
 	gbz80.SetR16Register(reg, gbz80.GetR16Register(reg)-1)
+}
+
+func (gbz80 *Gbz80) Halt() {
+	gbz80.Halted = true
 }

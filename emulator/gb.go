@@ -191,13 +191,30 @@ func (dmg *DMG) ExecuteCurrentInstruction() {
 		case 1:
 			// 8 Bit Loading
 			if z == 6 && y == 6 {
-				// HALT
+				Halt(dmg)
 			} else {
 				LDr8r8(dmg, R[y], R[z])
 			}
 		case 2:
 			// ALU operations on acc & registers
-
+			switch y {
+			case 0:
+			// ADD A, r[z]
+			case 1:
+			// ADC A, r[z]
+			case 2:
+			// SUB A, r[z]
+			case 3:
+			// SBC A, r[z]
+			case 4:
+			// AND A, r[z]
+			case 5:
+			// XOR A, r[z]
+			case 6:
+			// OR A, r[z]
+			case 7:
+				// CP A, r[z]
+			}
 		case 3:
 			// Jump, Pop, Call, Returns
 		}

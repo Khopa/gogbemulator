@@ -6,3 +6,12 @@ package emulator
 func NOP(dmg *DMG) {
 	// do nothing !
 }
+
+// Enter low power mode
+func Halt(dmg *DMG) {
+	if dmg.Gbz80.Ime {
+		dmg.Gbz80.Halt()
+	} else {
+
+	}
+}
