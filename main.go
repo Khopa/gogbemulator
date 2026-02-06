@@ -60,7 +60,8 @@ func main() {
 	})
 
 	image := canvas.NewImageFromFile("./resources/gopher.png")
-	image.Resize(fyne.NewSize(32, 32))
+	image.FillMode = canvas.ImageFillContain
+	image.SetMinSize(fyne.NewSize(356, 356))
 
 	regLabel := widget.NewLabel("")
 	regPanel := container.NewVBox(
