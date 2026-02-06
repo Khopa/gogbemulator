@@ -174,6 +174,18 @@ func (dmg *DMG) ExecuteCurrentInstruction() {
 					Rlca(dmg)
 				case 1:
 					Rrca(dmg)
+				case 2:
+					Rla(dmg)
+				case 3:
+					Rra(dmg)
+				case 4:
+					Daa(dmg)
+				case 5:
+					Cpl(dmg)
+				case 6:
+					Scf(dmg)
+				case 7:
+					Ccf(dmg)
 				}
 			}
 		case 1:

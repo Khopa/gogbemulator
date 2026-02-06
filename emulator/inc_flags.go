@@ -37,3 +37,22 @@ func Daa(dmg *DMG) {
 	dmg.Gbz80.setFlag(FLAG_C, c)
 
 }
+
+// Cpl Complement accumulator (A = ~A); also called bitwise NOT.
+func Cpl(dmg *DMG) {
+	dmg.Gbz80.SetR8Register(R8_A, ^dmg.Gbz80.A())
+}
+
+// Scf Set Carry Flag
+func Scf(dmg *DMG) {
+	dmg.Gbz80.setFlag(FLAG_C, true)
+	dmg.Gbz80.setFlag(FLAG_H, false)
+	dmg.Gbz80.setFlag(FLAG_N, false)
+}
+
+// Ccf Complement Carry Flag
+func Ccf(dmg *DMG) {
+	dmg.Gbz80.setFlag(FLAG_C, !dmg.Gbz80.CarryFlag())
+	dmg.Gbz80.setFlag(FLAG_H, false)
+	dmg.Gbz80.setFlag(FLAG_N, false)
+}

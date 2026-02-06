@@ -101,3 +101,75 @@ func TestOverflowingDaaWithSubstractionAndCarryAndHalfCarryFlag(t *testing.T) {
 		t.Error("Half Carry should be cleared")
 	}
 }
+
+func TestCpl(t *testing.T) {
+	dmg := MakeDMG()
+	dmg.Gbz80.SetR8Register(R8_A, 0b10101111)
+	Cpl(dmg)
+	if dmg.Gbz80.A() != 0b01010000 {
+		t.Errorf("CPL not working correctly, got %b instead of 0b01010000", dmg.Gbz80.A())
+	}
+}
+
+func TestCplAllZero(t *testing.T) {
+	dmg := MakeDMG()
+	dmg.Gbz80.SetR8Register(R8_A, 0b00000000)
+	Cpl(dmg)
+	if dmg.Gbz80.A() != 0b11111111 {
+		t.Errorf("CPL not working correctly, got %b instead of 0b11111111", dmg.Gbz80.A())
+	}
+}
+
+func TestScf(t *testing.T) {
+	dmg := MakeDMG()
+	dmg.Gbz80.setFlag(FLAG_Z, false)
+	dmg.Gbz80.setFlag(FLAG_C, true)
+	dmg.Gbz80.setFlag(FLAG_N, true)
+	dmg.Gbz80.setFlag(FLAG_H, true)
+	Scf(dmg)
+	if !dmg.Gbz80.CarryFlag() {
+		t.Error("Expected Carry Flag set")
+	}
+	if dmg.Gbz80.SubtractionFlag() {
+		t.Error("Expected Substraction Flag cleared")
+	}
+	if dmg.Gbz80.HalfCarryFlag() {
+		t.Error("Expected Half Carry Flag cleared")
+	}
+}
+
+func TestCcf(t *testing.T) {
+	dmg := MakeDMG()
+	dmg.Gbz80.setFlag(FLAG_Z, false)
+	dmg.Gbz80.setFlag(FLAG_C, false)
+	dmg.Gbz80.setFlag(FLAG_N, true)
+	dmg.Gbz80.setFlag(FLAG_H, true)
+	Ccf(dmg)
+	if !dmg.Gbz80.CarryFlag() {
+		t.Error("Expected Carry Flag set")
+	}
+	if dmg.Gbz80.SubtractionFlag() {
+		t.Error("Expected Substraction Flag cleared")
+	}
+	if dmg.Gbz80.HalfCarryFlag() {
+		t.Error("Expected Half Carry Flag cleared")
+	}
+}
+
+func TestCcfClear(t *testing.T) {
+	dmg := MakeDMG()
+	dmg.Gbz80.setFlag(FLAG_Z, false)
+	dmg.Gbz80.setFlag(FLAG_C, true)
+	dmg.Gbz80.setFlag(FLAG_N, true)
+	dmg.Gbz80.setFlag(FLAG_H, true)
+	Ccf(dmg)
+	if dmg.Gbz80.CarryFlag() {
+		t.Error("Expected Carry Flag cleared")
+	}
+	if dmg.Gbz80.SubtractionFlag() {
+		t.Error("Expected Substraction Flag cleared")
+	}
+	if dmg.Gbz80.HalfCarryFlag() {
+		t.Error("Expected Half Carry Flag cleared")
+	}
+}
