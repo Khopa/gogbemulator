@@ -45,6 +45,8 @@ func main() {
 	}
 	dmg.Gbz80.Pc = 0x150
 
+	emulator.Dissasembly("testrom.gb")
+
 	// Create Fyne APP
 	a := app.New()
 	w := a.NewWindow("Go GB Emulator")
