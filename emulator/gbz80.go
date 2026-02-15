@@ -50,6 +50,7 @@ const (
 	R16_HL R16Register = 2 // H&L registers
 	R16_SP R16Register = 3 // Stack Pointer
 	R16_AF R16Register = 4 // A&F Registers
+	R16_PC R16Register = 5 // Program Counter
 )
 
 // Conditions Table (For CPU Matrix)
@@ -301,6 +302,8 @@ func (gbz80 *Gbz80) SetR16Register(reg R16Register, value uint16) {
 		gbz80.Sp = value
 	case R16_AF:
 		gbz80.Af = value
+	case R16_PC:
+		gbz80.Pc = value
 	}
 }
 
@@ -317,6 +320,8 @@ func (gbz80 *Gbz80) GetR16Register(reg R16Register) uint16 {
 		return gbz80.Sp
 	case R16_AF:
 		return gbz80.Af
+	case R16_PC:
+		return gbz80.Pc
 	}
 	return 0
 }
@@ -343,4 +348,9 @@ func (gbz80 *Gbz80) DecrementR16Register(reg R16Register) {
 
 func (gbz80 *Gbz80) Halt() {
 	gbz80.Halted = true
+}
+
+func (gbz80 *Gbz80) Stop() {
+	// Very weird, I need to read more about it.
+	// https://gbdev.io/pandocs/Reducing_Power_Consumption.html#using-the-stop-instruction
 }

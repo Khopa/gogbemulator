@@ -80,10 +80,13 @@ func (dmg *DMG) ExecuteCurrentInstruction() {
 	// First check for prefix & read opcode
 	isCBPrefixed := false
 	opcode := dmg.Memory[dmg.Gbz80.Pc]
+	var d uint8
+	print(d)
 	if opcode == 0xCB {
 		isCBPrefixed = true
-		opcode = dmg.Memory[dmg.Gbz80.Pc+1]
-		dmg.Gbz80.Pc += 1
+		d = dmg.Memory[dmg.Gbz80.Pc+1]
+		opcode = dmg.Memory[dmg.Gbz80.Pc+2]
+		dmg.Gbz80.Pc += 2
 	}
 	dmg.Gbz80.Pc += 1
 
@@ -105,13 +108,21 @@ func (dmg *DMG) ExecuteCurrentInstruction() {
 				case 0:
 					NOP(dmg)
 				case 1:
-					// TODO: LD (nn), SP
+					var nn uint16
+					nn = uint16(dmg.Memory[dmg.Gbz80.Pc])<<8 + uint16(dmg.Memory[dmg.Gbz80.Pc+1])
+					dmg.Gbz80.Pc += 2
+					LDn16SP(dmg, nn)
 				case 2:
-					// TODO: STOP
+					Stop(dmg)
 				case 3:
-					// TODO: JR d
+					db := int8(dmg.Memory[dmg.Gbz80.Pc])
+					dmg.Gbz80.Pc += 1
+					JRd(dmg, db)
 				default:
-					// TODO: JR cc[y-4], d
+					db := int8(dmg.Memory[dmg.Gbz80.Pc])
+					cc := CC[y-4]
+					dmg.Gbz80.Pc += 1
+					JRCCd(dmg, cc, db)
 				}
 			case 0x1:
 				// 16 bit load ops
@@ -220,6 +231,7 @@ func (dmg *DMG) ExecuteCurrentInstruction() {
 		}
 
 	} else {
+		// CB prefixed operations
 		switch x {
 		case 0x0:
 			// rotation/Shift instructions

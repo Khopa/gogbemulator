@@ -43,9 +43,20 @@ func LDAr16(dmg *DMG, r16 uint16) {
 	dmg.Gbz80.SetR8Register(R8_A, dmg.Memory[r16])
 }
 
+// LDn16SP Copy SP & $FF at address n16 and SP >> 8 at address n16 + 1.
+func LDn16SP(dmg *DMG, n16 uint16) {
+	dmg.SetMemoryU8(n16, uint8(dmg.Gbz80.SP()&0xFF))
+	dmg.SetMemoryU8(n16+1, uint8(dmg.Gbz80.SP()>>8))
+}
+
+// LDn16A Copy the value in register A into the byte at address n16.
+func LDn16A(dmg *DMG, n16 uint16) {
+	dmg.SetMemoryU8(n16, dmg.Gbz80.A())
+}
+
 // LDHn16A Copy the value in register A into the byte at address n16.
 func LDHn16A(dmg *DMG, n16 uint16) {
-	dmg.SetMemoryU8(n16, dmg.Gbz80.A())
+	dmg.SetMemoryU8(0xFF00+n16, dmg.Gbz80.A())
 }
 
 // LDHCA Copy the value in register A into the byte at address $FF00+C.
