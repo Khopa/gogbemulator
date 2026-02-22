@@ -31,3 +31,31 @@ func JRCCd(dmg *DMG, CC uint8, d int8) {
 		JRd(dmg, d)
 	}
 }
+
+// Jpn16 Jump to address n16; effectively, copy n16 into PC.
+func Jpn16(dmg *DMG, n16 uint16) {
+	dmg.Gbz80.SetR16Register(R16_PC, n16)
+}
+
+// Jpccn16 Jump to address n16 if condition cc is met.
+func Jpccn16(dmg *DMG, CC uint8, n16 uint16) {
+	conditionMet := false
+	switch CC {
+	case CC_NZ:
+		conditionMet = !dmg.Gbz80.ZeroFlag()
+	case CC_Z:
+		conditionMet = dmg.Gbz80.ZeroFlag()
+	case CC_NC:
+		conditionMet = !dmg.Gbz80.CarryFlag()
+	case CC_C:
+		conditionMet = dmg.Gbz80.CarryFlag()
+	}
+	if conditionMet {
+		dmg.Gbz80.SetR16Register(R16_PC, n16)
+	}
+}
+
+// Jphl Jump to address in HL; effectively, copy the value in register HL into PC.
+func Jphl(dmg *DMG) {
+	dmg.Gbz80.SetR16Register(R16_PC, dmg.Gbz80.GetR16Register(R16_HL))
+}

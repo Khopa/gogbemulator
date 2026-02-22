@@ -91,11 +91,11 @@ func (dmg *DMG) ExecuteCurrentInstruction() {
 	dmg.Gbz80.Pc += 1
 
 	// Compute cpu matrix path values
-	x := opcode & 0xC0
-	y := opcode & 0x38
-	z := opcode & 0x07
-	p := opcode & 0x30
-	q := opcode & 0x08
+	x := opcode & 0b11000000 >> 6
+	y := opcode & 0b00111000 >> 3
+	z := opcode & 0b00000111
+	p := opcode & 0b00010000 >> 4
+	q := opcode & 0b00001000 >> 3
 
 	if !isCBPrefixed {
 
@@ -227,7 +227,128 @@ func (dmg *DMG) ExecuteCurrentInstruction() {
 				// CP A, r[z]
 			}
 		case 3:
-			// Jump, Pop, Call, Returns
+			switch z {
+			case 0:
+				// Conditional return, mem-mapped register loads and stack operations
+				if y <= 3 {
+					fmt.Printf("RET %s", DIS_CC[y])
+					RetCc(dmg, CC[y])
+				} else if y == 4 {
+					n := dmg.Memory[dmg.Gbz80.Pc]
+					dmg.Gbz80.Pc += 1
+					fmt.Printf("LDH %d, A", n)
+					// TODO IMPLEMENT
+				} else if y == 5 {
+					db := int8(dmg.Memory[dmg.Gbz80.Pc])
+					dmg.Gbz80.Pc += 1
+					fmt.Printf("ADD SP, %d", db)
+					// TODO IMPLEMENT
+				} else if y == 6 {
+					n := dmg.Memory[dmg.Gbz80.Pc]
+					dmg.Gbz80.Pc += 1
+					fmt.Printf("LDH A, %d", n)
+					// TODO IMPLEMENT
+				} else if y == 7 {
+					db := int8(dmg.Memory[dmg.Gbz80.Pc])
+					dmg.Gbz80.Pc += 1
+					fmt.Printf("LD HL, SP+ %d", db)
+					// TODO IMPLEMENT
+				}
+			case 1:
+				// POP & various ops
+				if q == 0 {
+					fmt.Printf("POP %s", DIS_RP2[p])
+					Popr16(dmg, RP2[p])
+				} else {
+					if p == 0 {
+						fmt.Printf("RET")
+						Ret(dmg)
+					} else if p == 1 {
+						fmt.Printf("RETI")
+						// TODO IMPLEMENT
+					} else if p == 2 {
+						fmt.Printf("JP HL")
+						Jphl(dmg)
+					} else if p == 3 {
+						fmt.Printf("LD SP, HL")
+						// TODO IMPLEMENT
+					}
+				}
+			case 2:
+				// Conditional jumps
+				if y <= 3 {
+					var nn uint16
+					nn = uint16(dmg.Memory[dmg.Gbz80.Pc])<<8 + uint16(dmg.Memory[dmg.Gbz80.Pc+1])
+					dmg.Gbz80.Pc += 2
+					fmt.Printf("JP %s, %d", DIS_CC[y], nn)
+					Jpccn16(dmg, CC[y], nn)
+				} else if y == 4 {
+					fmt.Printf("LDH C, A")
+				} else if y == 5 {
+					var nn uint16
+					nn = uint16(dmg.Memory[dmg.Gbz80.Pc])<<8 + uint16(dmg.Memory[dmg.Gbz80.Pc+1])
+					dmg.Gbz80.Pc += 2
+					fmt.Printf("LD (%d), A", nn)
+					// TODO: Implement
+				} else if y == 6 {
+					fmt.Printf("LDH A, C")
+				} else if y == 7 {
+					var nn uint16
+					nn = uint16(dmg.Memory[dmg.Gbz80.Pc])<<8 + uint16(dmg.Memory[dmg.Gbz80.Pc+1])
+					dmg.Gbz80.Pc += 2
+					fmt.Printf("LD A, (%d)", nn)
+					// TODO: Implement
+				}
+			case 3:
+				if y == 0 {
+					var nn uint16
+					nn = uint16(dmg.Memory[dmg.Gbz80.Pc])<<8 + uint16(dmg.Memory[dmg.Gbz80.Pc+1])
+					dmg.Gbz80.Pc += 2
+					fmt.Printf("JP %d", nn)
+					Jpn16(dmg, nn)
+				} else if y == 6 {
+					fmt.Printf("DI")
+					// TODO: Implement
+				} else if y == 7 {
+					fmt.Printf("EI")
+					// TODO: Implement
+				} else {
+					fmt.Printf("WARNING : INVALID INSTRUCTIONS")
+				}
+			case 4:
+				if y <= 3 {
+					var nn uint16
+					nn = uint16(dmg.Memory[dmg.Gbz80.Pc])<<8 + uint16(dmg.Memory[dmg.Gbz80.Pc+1])
+					dmg.Gbz80.Pc += 2
+					fmt.Printf("CALL %s, %d", DIS_CC[y], nn)
+					// TODO: Implement
+				} else {
+					fmt.Printf("WARNING : INVALID INSTRUCTIONS")
+				}
+			case 5:
+				if q == 0 {
+					fmt.Printf("PUSH %s", DIS_RP2[p])
+					Pushr16(dmg, RP2[p])
+				} else {
+					if p == 0 {
+						var nn uint16
+						nn = uint16(dmg.Memory[dmg.Gbz80.Pc])<<8 + uint16(dmg.Memory[dmg.Gbz80.Pc+1])
+						dmg.Gbz80.Pc += 2
+						fmt.Printf("CALL %d", nn)
+						Calln16(dmg, nn)
+					} else {
+						fmt.Printf("WARNING : INVALID INSTRUCTIONS")
+					}
+				}
+			case 6:
+				n := dmg.Memory[dmg.Gbz80.Pc]
+				dmg.Gbz80.Pc += 1
+				fmt.Printf("%s %d", DIS_ALU[y], n)
+				// TODO: Implement
+			case 7:
+				fmt.Printf("RST %d", y*8)
+				// TODO: Implement
+			}
 		}
 
 	} else {

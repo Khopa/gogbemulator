@@ -45,7 +45,7 @@ func main() {
 	}
 	dmg.Gbz80.Pc = 0x150
 
-	emulator.Dissasembly("testrom.gb")
+	dissasembly := emulator.Disassembly("testrom.gb", dmg.Gbz80.Pc, 150)
 
 	// Create Fyne APP
 	a := app.New()
@@ -91,7 +91,7 @@ func main() {
 
 	memEntry := widget.NewMultiLineEntry()
 	memEntry.Wrapping = fyne.TextWrapOff
-	memEntry.SetText(formatMemory(dmg.Memory[0:512], 0))
+	memEntry.SetText(dissasembly)
 
 	memPanel := container.NewBorder(
 		widget.NewLabel("Memory"),
@@ -100,7 +100,8 @@ func main() {
 	)
 
 	updateMemory = func() {
-		memEntry.SetText(formatMemory(dmg.Memory[dmg.Gbz80.PC():dmg.Gbz80.PC()+512], dmg.Gbz80.PC()))
+		dissasembly = emulator.Disassembly("testrom.gb", dmg.Gbz80.Pc, 150)
+		memEntry.SetText(dissasembly)
 	}
 
 	// --- Layout Split ---
@@ -120,7 +121,7 @@ func main() {
 			// run
 			// dmg.Step()
 			fyne.Do(updateRegisters)
-			fyne.Do(updateMemory)
+			//fyne.Do(updateMemory)
 		}
 	}()
 

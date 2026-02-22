@@ -10,8 +10,8 @@ var DIS_CC = []string{"NZ", "Z", "NC", "C"}
 var DIS_ALU = []string{"ADD A,", "ADC A,", "SUB", "SBC A,", "AND", "XOR", "OR", "CP"}
 var DIS_ROT = []string{"RLC", "RRC", "RL", "RR", "SLA", "SRA", "SWAP", "SRL"}
 
-// Dissasembly Dissasemble given ROM
-func Dissasembly(path string) string {
+// Disassembly Dissasemble given ROM
+func Disassembly(path string, startPos uint16, lines int) string {
 	dmg := MakeDMG()
 	err := dmg.LoadROM(path)
 	if err != nil {
@@ -19,17 +19,20 @@ func Dissasembly(path string) string {
 	}
 	var dissasembly string
 
-	fmt.Println("\nDissasembling :")
 	i := 0
+	dmg.Gbz80.Pc = startPos
 
 	for {
 		ins := DisassembleCurrentInstructions(dmg)
-		fmt.Printf("%d # %s\n", i, ins)
-		dissasembly += ins + "\n"
+		// fmt.Printf("%d # %s\n", startPos+uint16(i), ins)
+		dissasembly += fmt.Sprintf("%d # %s\n", startPos+uint16(i), ins)
 		if dmg.Gbz80.PC() >= 0xFFFF {
 			break
 		}
 		i++
+		if i > lines && lines != -1 {
+			break
+		}
 	}
 	return dissasembly
 }
@@ -210,7 +213,7 @@ func DisassembleCurrentInstructions(dmg *DMG) string {
 					var nn uint16
 					nn = uint16(dmg.Memory[dmg.Gbz80.Pc])<<8 + uint16(dmg.Memory[dmg.Gbz80.Pc+1])
 					dmg.Gbz80.Pc += 2
-					return fmt.Sprintf("JP %s, %d", DIS_RP2[p], nn)
+					return fmt.Sprintf("JP %s, %d", DIS_CC[y], nn)
 				} else if y == 4 {
 					return "LDH C, A"
 				} else if y == 5 {
