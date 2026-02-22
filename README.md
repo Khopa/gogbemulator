@@ -9,7 +9,7 @@ Work in progress, not usable yet !
 How to launch:
 
 Copy a gameboy rom as "testrom.gb" in the root directory of your clone.
-It must be a 8KB rom, this doesn't support mappers & bank switching for more advanced roms yet !
+It must be a 32KB rom at most without any fancy custom banks, this doesn't support mappers & bank switching yet !
 
 ```go run main.go```
 
