@@ -1,5 +1,8 @@
 # Gameboy Emulator 
 
+[![Tests](https://github.com/Khopa/gogbemulator/actions/workflows/go.yml/badge.svg)](https://github.com/Khopa/gogbemulator/actions/workflows/go.yml)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/Khopa/gogbemulator)](https://github.com/Khopa/gogbemulator/blob/main/go.mod)
+
 Attempt to write a Game Boy Emulator in Golang.
 
 ![img](screenshot.png)
