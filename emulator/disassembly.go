@@ -18,6 +18,7 @@ func Disassembly(path string, startPos uint16, lines int) string {
 		panic(err)
 	}
 	var dissasembly string
+	dissasembly = "CURRENT INSTRUCTIONS ===> "
 
 	i := 0
 	dmg.Gbz80.Pc = startPos

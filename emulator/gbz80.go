@@ -1,11 +1,8 @@
 package emulator
 
-import "fmt"
-
-type DMG struct {
-	Gbz80  *Gbz80
-	Memory [MemorySize]uint8 // 64KB Memory
-}
+import (
+	"fmt"
+)
 
 // SetMemoryU8 sets Memory at address to value
 func (dmg *DMG) SetMemoryU8(address uint16, value uint8) {

@@ -45,7 +45,7 @@ func main() {
 	}
 	dmg.Gbz80.Pc = 0x150
 
-	dissasembly := emulator.Disassembly("testrom.gb", dmg.Gbz80.Pc, 150)
+	dissasembly := emulator.Disassembly("testrom.gb", dmg.Gbz80.Pc, 20)
 
 	// Create Fyne APP
 	a := app.New()
@@ -55,20 +55,28 @@ func main() {
 	var updateRegisters func()
 	var updateMemory func()
 
+	screenImage := canvas.NewImageFromImage(dmg.Snapshot())
+	screenImage.ScaleMode = canvas.ImageScalePixels
+	screenImage.FillMode = canvas.ImageFillContain
+	screenContainer := container.NewVBox(
+		widget.NewLabel("LCD"),
+		screenImage,
+	)
+	screenImage.SetMinSize(fyne.NewSize(
+		160*3,
+		144*3,
+	))
+
 	stepButton := widget.NewButton("Step", func() {
 		dmg.Step()
 		updateRegisters()
 		updateMemory()
+		screenImage.Image = dmg.Snapshot()
+		screenImage.Refresh()
 	})
-
-	image := canvas.NewImageFromFile("./resources/gopher.png")
-	image.FillMode = canvas.ImageFillContain
-	image.SetMinSize(fyne.NewSize(356, 356))
 
 	regLabel := widget.NewLabel("")
 	regPanel := container.NewVBox(
-		image,
-		widget.NewSeparator(),
 		widget.NewLabel("Registers"),
 		regLabel,
 		widget.NewSeparator(),
@@ -100,19 +108,24 @@ func main() {
 	)
 
 	updateMemory = func() {
-		dissasembly = emulator.Disassembly("testrom.gb", dmg.Gbz80.Pc, 150)
+		dissasembly = emulator.Disassembly("testrom.gb", dmg.Gbz80.Pc, 15)
 		memEntry.SetText(dissasembly)
 	}
 
 	// --- Layout Split ---
-	split := container.NewHSplit(
+	topSplit := container.NewHSplit(
 		regPanel,
+		screenContainer,
+	)
+	topSplit.Offset = 0.25
+
+	mainLayout := container.NewVSplit(
+		topSplit,
 		memPanel,
 	)
-	split.Offset = 0.25
+	mainLayout.Offset = 0.45
 
-	w.SetContent(split)
-	w.Resize(fyne.NewSize(900, 600))
+	w.SetContent(mainLayout)
 
 	// simulate emulator updates
 	go func() {

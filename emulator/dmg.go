@@ -2,16 +2,31 @@ package emulator
 
 import (
 	"fmt"
+	"image"
+	"image/color"
 	"os"
 )
+
+const (
+	ScreenWidth  = 160
+	ScreenHeight = 144
+)
+
+type DMG struct {
+	Gbz80  *Gbz80
+	Memory [MemorySize]uint8 // 64KB Memory
+	Screen [ScreenWidth * ScreenHeight]color.RGBA
+}
 
 // MakeDMG Create a new instance of the DMG (Game Boy)
 func MakeDMG() *DMG {
 	var mem [MemorySize]uint8
-	return &DMG{
+	d := &DMG{
 		Gbz80:  MakeGbz80(),
 		Memory: mem,
 	}
+	d.ClearScreen()
+	return d
 }
 
 // PrintMemory prints the Full Memory
@@ -70,6 +85,38 @@ func (dmg *DMG) LoadROM(path string) error {
 
 func (dmg *DMG) Step() {
 	dmg.ExecuteCurrentInstruction()
+	dmg.RenderFrame()
+}
+
+func (d *DMG) RenderFrame() {
+	for y := 0; y < ScreenHeight; y++ {
+		for x := 0; x < ScreenWidth; x++ {
+			i := y*ScreenWidth + x
+
+			// Temporary test
+			if (d.Gbz80.PC())%4 == 0 {
+				d.Screen[i] = color.RGBA{0x00, 0xBB, 0x00, 0xFF}
+			} else {
+				d.Screen[i] = color.RGBA{0xAA, 0xAA, 0xAA, 0xFF}
+			}
+		}
+	}
+}
+
+func (d *DMG) ClearScreen() {
+	for i := range d.Screen {
+		d.Screen[i] = color.RGBA{0x00, 0x00, 0x00, 0xFF} // white
+	}
+}
+
+func (d *DMG) Snapshot() image.Image {
+	img := image.NewRGBA(image.Rect(0, 0, ScreenWidth, ScreenHeight))
+	for y := 0; y < ScreenHeight; y++ {
+		for x := 0; x < ScreenWidth; x++ {
+			img.Set(x, y, d.Screen[y*ScreenWidth+x])
+		}
+	}
+	return img
 }
 
 func (dmg *DMG) ExecuteCurrentInstruction() {
